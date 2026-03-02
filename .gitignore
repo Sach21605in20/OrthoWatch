@@ -42,5 +42,4 @@ full_build.txt
 
 # Documentation and Text Files
 docs/
-*.md
 *.txt
