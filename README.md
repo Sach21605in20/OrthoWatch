@@ -61,14 +61,6 @@ graph TD
     G --> H[Early Intervention]
     H --> I[Reduced Readmission]
 ```
-
----
-
-## 📈 Impact Metrics (Projected)
-- **30% Reduction** in preventable post-op readmissions.
-- **50% Faster** detection of infection/DVT symptoms.
-- **4.8/5 Patient Satisfaction** due to proactive "eyes-on" care.
-
 ---
 
 ## 🏗️ Architecture Architecture
