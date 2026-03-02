@@ -1,6 +1,7 @@
 package com.orthowatch.repository;
 
 import com.orthowatch.model.Episode;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,8 @@ public interface EpisodeRepository extends JpaRepository<Episode, UUID> {
 
   boolean existsByPatientIdAndTemplateSurgeryTypeAndStatus(
       UUID patientId, String surgeryType, String status);
+
+  List<Episode> findByStatusAndConsentStatus(String status, String consentStatus);
+
+  List<Episode> findByConsentStatusAndCreatedAtBefore(String consentStatus, OffsetDateTime cutoff);
 }
