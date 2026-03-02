@@ -115,8 +115,39 @@ One repository per entity with domain-specific query methods.
 
 ---
 
-## Next: Phase 3.2 — Daily Checklist Ingest + Risk Engine
-- Daily response ingestion pipeline
-- WhatsApp template configuration
-- Risk scoring logic (v1)
+## ✅ Phase 3.2 — Risk Engine (TDD) (Completed 2026-03-02)
+- **Status**: Verified — 12 tests passing (12 unit, TDD RED→GREEN→REFACTOR)
 
+### What was built
+
+#### Production Code
+- **Service**: `RiskEngineService` — rule-based risk scoring engine (234 lines)
+  - Strategy-pattern rule evaluation (FEVER_ABOVE_100, DVT_ANY_PRESENT, PAIN_SPIKE_GT_2, SWELLING_INCREASING_2D, WOUND_REDNESS_DISCHARGE)
+  - Composite score calculation (sum of triggered weights, capped at 100)
+  - Risk level classification: LOW (0–30), MEDIUM (31–60), HIGH (61–100)
+  - 3-day trajectory computation (IMPROVING, STABLE, WORSENING)
+  - Rule version snapshot stored in JSONB with each calculation
+  - Automatic HIGH_RISK alert generation assigned to primary surgeon
+
+#### Flyway Migrations
+- `V6__seed_risk_rules.sql` — 5 default risk rules (FEVER_HIGH, DVT_SYMPTOMS, PAIN_SPIKE, SWELLING_TREND, WOUND_CONCERN)
+
+#### Repository Updates
+- `RiskRuleRepository` — added `findByIsActiveTrue()`
+- `DailyResponseRepository` — added `findByEpisodeIdOrderByDayNumberDesc()`
+
+#### Tests (TDD)
+- **Unit (12/12)**: `RiskEngineServiceTest` — Mockito tests covering:
+  - Individual rule evaluation (fever, DVT, pain spike, swelling trend)
+  - Composite score calculation and cap at 100
+  - Risk level classification (LOW/MEDIUM/HIGH)
+  - 3-day trajectory (IMPROVING/STABLE/WORSENING) + null for Day 1
+  - Rule version snapshot persistence
+  - Alert generation for HIGH risk, no alert for MEDIUM/LOW
+
+---
+
+## Next: Phase 3.3 — Checklist Service & Scheduled Tasks
+- `ChecklistService` for daily response processing
+- `ScheduledTasks` with `@Scheduled` methods for checklists, reminders, escalations
+- Risk engine integration on checklist completion
