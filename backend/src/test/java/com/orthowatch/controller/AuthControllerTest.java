@@ -1,9 +1,9 @@
 package com.orthowatch.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orthowatch.config.JwtAuthenticationFilter;
 import com.orthowatch.dto.LoginRequest;
 import com.orthowatch.dto.LoginResponse;
+import com.orthowatch.exception.GlobalExceptionHandler;
 import com.orthowatch.service.AuthService;
 import com.orthowatch.service.UserDetailsServiceImpl;
 import com.orthowatch.util.JwtUtil;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -21,7 +22,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest
+@ContextConfiguration(classes = {AuthController.class, GlobalExceptionHandler.class})
 @AutoConfigureMockMvc(addFilters = false)
 public class AuthControllerTest {
 
@@ -33,9 +35,6 @@ public class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
-
-    @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @MockBean
     private UserDetailsServiceImpl userDetailsService;
