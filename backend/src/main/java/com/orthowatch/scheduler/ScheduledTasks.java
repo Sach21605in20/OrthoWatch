@@ -7,6 +7,7 @@ import com.orthowatch.repository.AlertRepository;
 import com.orthowatch.repository.DailyResponseRepository;
 import com.orthowatch.repository.EpisodeRepository;
 import com.orthowatch.repository.SessionRepository;
+import com.orthowatch.service.AlertService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Scheduled tasks for daily checklist dispatch, reminders, escalation, consent timeout, and session
- * cleanup.
+ * Scheduled tasks for daily checklist dispatch, reminders, escalation, consent timeout, SLA
+ * auto-forward, and session cleanup.
  *
  * <p>Uses Spring {@code @Scheduled} for MVP (single hospital, IST timezone). Quartz with JDBC job
  * store deferred to post-pilot for multi-hospital/multi-timezone support.
@@ -37,6 +38,7 @@ public class ScheduledTasks {
   private final DailyResponseRepository dailyResponseRepository;
   private final AlertRepository alertRepository;
   private final SessionRepository sessionRepository;
+  private final AlertService alertService;
 
   /**
    * Dispatch daily checklists at 9 AM IST for all active episodes with granted consent.
@@ -197,5 +199,13 @@ public class ScheduledTasks {
     OffsetDateTime now = OffsetDateTime.now();
     sessionRepository.deleteByExpiresAtBefore(now);
     logger.info("Expired sessions cleaned up at {}", now);
+  }
+
+  /**
+   * Auto-forward PENDING alerts that have exceeded their SLA deadline to the secondary clinician.
+   */
+  @Scheduled(fixedRate = 60000)
+  public void autoForwardExpiredAlerts() {
+    alertService.autoForwardExpiredAlerts();
   }
 }

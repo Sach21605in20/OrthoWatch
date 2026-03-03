@@ -3,6 +3,10 @@ spring:
     name: orthowatch-backend
   profiles:
     active: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/orthowatch}
     username: ${SPRING_DATASOURCE_USERNAME:orthowatch_user}
@@ -32,3 +36,7 @@ app:
     refresh-secret: ${APP_JWT_REFRESH_SECRET}
     expiration: ${APP_JWT_EXPIRATION}
     refresh-expiration: ${APP_JWT_REFRESH_EXPIRATION}
+  storage:
+    provider: ${APP_STORAGE_PROVIDER:LOCAL}
+    local-path: ${APP_STORAGE_LOCAL_PATH:./uploads/wound-images}
+    max-file-size: ${APP_STORAGE_MAX_FILE_SIZE:10485760}

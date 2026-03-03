@@ -9,6 +9,7 @@ import com.orthowatch.repository.AlertRepository;
 import com.orthowatch.repository.DailyResponseRepository;
 import com.orthowatch.repository.EpisodeRepository;
 import com.orthowatch.repository.SessionRepository;
+import com.orthowatch.service.AlertService;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -27,6 +28,7 @@ class ScheduledTasksTest {
   @Mock private DailyResponseRepository dailyResponseRepository;
   @Mock private AlertRepository alertRepository;
   @Mock private SessionRepository sessionRepository;
+  @Mock private AlertService alertService;
 
   @InjectMocks private ScheduledTasks scheduledTasks;
 

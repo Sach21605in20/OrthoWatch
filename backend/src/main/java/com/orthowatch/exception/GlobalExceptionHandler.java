@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -101,6 +102,34 @@ public class GlobalExceptionHandler {
             .path(request.getRequestURI())
             .build();
     return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(InvalidFileException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidFile(
+      InvalidFileException ex, HttpServletRequest request) {
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Invalid File")
+            .message(ex.getMessage())
+            .path(request.getRequestURI())
+            .build();
+    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ResponseEntity<ErrorResponse> handleMaxUploadSize(
+      MaxUploadSizeExceededException ex, HttpServletRequest request) {
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.PAYLOAD_TOO_LARGE.value())
+            .error("Payload Too Large")
+            .message("File size exceeds maximum allowed upload size of 10 MB.")
+            .path(request.getRequestURI())
+            .build();
+    return new ResponseEntity<>(error, HttpStatus.PAYLOAD_TOO_LARGE);
   }
 
   @ExceptionHandler(Exception.class)
