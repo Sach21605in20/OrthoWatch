@@ -242,5 +242,64 @@ One repository per entity with domain-specific query methods.
 
 ---
 
-## Next: Phase 4.1 — WhatsApp Integration Setup
+## Phase 4.1: WhatsApp Integration Setup ✅
+**Status**: Complete. Meta Cloud API client, WhatsApp service, and webhook controller with full test coverage.
 
+### What was built
+
+#### Configuration
+- `WhatsAppProperties.java` — `@ConfigurationProperties(prefix = "app.whatsapp")` bean for apiUrl, phoneNumberId, accessToken, verifyToken
+- `application.yml` — added `app.whatsapp.*` properties (env-variable backed)
+- `application-dev.yml` — dev-profile WhatsApp settings with test sandbox placeholders
+
+#### WhatsApp API Client
+- `WhatsAppApiClient.java` — RestTemplate-based HTTP client for Meta Graph API v18.0:
+  - `sendTextMessage()` — plain text messages
+  - `sendTemplateMessage()` — Meta-approved template messages with parameters
+  - `sendInteractiveButtonMessage()` — interactive button messages (up to 3 buttons)
+  - `sendMessage()` — low-level send with retry logic (3 attempts, exponential backoff)
+  - Client errors (4xx) fail immediately; server errors (5xx) and connection issues trigger retries
+
+#### WhatsApp Service
+- `WhatsAppService.java` — high-level business messaging:
+  - `sendConsentRequest()` — consent buttons (YES/NO)
+  - `sendWelcomeMessage()` — post-consent welcome with surgery details and monitoring schedule
+  - `sendDailyChecklist()` — pain score buttons (Low/Moderate/Severe)
+  - `sendWoundImageRequest()` — image upload prompt with tips
+  - `sendReminder()` — non-response reminder
+  - `sendEmergencyOverride()` — urgent breathlessness/DVT warning with emergency number
+  - `sendEmergencyFollowUp()` — "going to hospital?" confirmation buttons
+  - `sendUseButtonsReply()` — free-text fallback message
+
+#### Webhook Controller
+- `WebhookController.java`:
+  - `GET /api/v1/webhook/whatsapp` — Meta verification (echoes hub.challenge)
+  - `POST /api/v1/webhook/whatsapp` — inbound message handler:
+    - Interactive button replies → consent handling (GRANTED/DECLINED), checklist responses, emergency follow-up
+    - Image messages → logged with mediaId (ready for download integration)
+    - Text messages → emergency keyword detection (breathless, chest pain, cannot breathe, DVT) triggers override flow; non-emergency free text gets "use buttons" reply
+    - Status updates (delivery receipts) → logged
+  - Phone number normalization (Meta sends without `+`, DB stores with `+`)
+  - Always returns HTTP 200 per Meta's requirement
+
+#### DTOs
+- `WhatsAppMessageRequest.java` — outbound message format (text, template, interactive)
+- `WhatsAppMessageResponse.java` — Meta API response with message IDs
+- `WhatsAppWebhookPayload.java` — inbound webhook structure with `@JsonIgnoreProperties(ignoreUnknown = true)`
+
+#### Exception Handling
+- `WhatsAppApiException.java` — custom runtime exception for API failures
+- `GlobalExceptionHandler` — added `handleWhatsAppApiException()` returning HTTP 502 Bad Gateway
+
+#### Repository Updates
+- `EpisodeRepository` — added `findByPatientIdAndStatus()` for webhook phone-to-episode lookup
+
+#### Tests
+- **Service (5/5)**: `WhatsAppApiClientTest` — text/template/interactive message sending, client error (no retry), server error (3 retries)
+- **Service (6/6)**: `WhatsAppServiceTest` — consent, daily checklist, wound image, reminder, emergency override, emergency follow-up
+- **Controller (5/5)**: `WebhookControllerTest` — webhook verification (valid/invalid token), button reply, consent acceptance, free-text handling
+- **Full suite: 83/83 tests passing (16 new, 0 regressions)**
+
+---
+
+## Next: Phase 4.2 — WhatsApp Checklist Scheduling & Response Processing

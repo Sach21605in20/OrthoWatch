@@ -19,4 +19,6 @@ public interface EpisodeRepository extends JpaRepository<Episode, UUID> {
   List<Episode> findByStatusAndConsentStatus(String status, String consentStatus);
 
   List<Episode> findByConsentStatusAndCreatedAtBefore(String consentStatus, OffsetDateTime cutoff);
+
+  java.util.Optional<Episode> findByPatientIdAndStatus(UUID patientId, String status);
 }
