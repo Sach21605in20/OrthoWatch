@@ -50,3 +50,4 @@ spring-shell.log
 
 # Documentation (local-only, not tracked)
 docs/
+*.md
