@@ -6,10 +6,19 @@ target/
 *.log
 .mvn/timing.properties
 
-# Environment
+# Environment — NEVER commit secrets
 .env
 .env.local
 .env.*.local
+backend/.env
+
+# Security — prevent accidental secret/key commits
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*.truststore
 
 # IDE
 .idea/
@@ -36,10 +45,8 @@ uploads/
 # Spring Boot
 spring-shell.log
 
-# Build logs
-build*.txt
-full_build.txt
-
-# Documentation and Text Files
-docs/
+# Text files and build logs
 *.txt
+
+# Documentation (local-only, not tracked)
+docs/
