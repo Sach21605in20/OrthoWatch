@@ -242,8 +242,8 @@ One repository per entity with domain-specific query methods.
 
 ---
 
-## Phase 4.1: WhatsApp Integration Setup ✅
-**Status**: Complete. Meta Cloud API client, WhatsApp service, and webhook controller with full test coverage.
+## Phase 4.1: WhatsApp Integration Setup ⚠️
+**Status**: Code complete (83/83 tests passing). Meta Developer account setup, sandbox testing, and template approval **NOT done** — deferred as non-blocking for continued code development.
 
 ### What was built
 
@@ -300,6 +300,25 @@ One repository per entity with domain-specific query methods.
 - **Controller (5/5)**: `WebhookControllerTest` — webhook verification (valid/invalid token), button reply, consent acceptance, free-text handling
 - **Full suite: 83/83 tests passing (16 new, 0 regressions)**
 
+#### ✅ Meta Account Setup (Completed 2026-03-07)
+Previously deferred (2026-03-06). All success criteria now verified:
+
+- **Meta Developer account** — ✅ created
+- **WhatsApp sandbox number** — ✅ configured, test phone `+919843424644` registered
+- **Webhook live verification** — ✅ `GET /api/v1/webhook/whatsapp` echoed challenge (ngrok tunnel, verified in Meta Console)
+- **Test message send** — ✅ `hello_world` template delivered to sandbox number (delivery receipt logged)
+- **Inbound message processing** — ✅ text reply received, patient lookup query executed (expected "no patient found" — no enrolled test patients)
+- **Message template approval** — ⏳ `daily_checklist` and `consent_request` submitted, status: **In Review** (7 Mar 2026)
+- **Access token security** — ✅ real token removed from `.env.example`, stored only in `.env` (gitignored)
+
+**Config changes**:
+- `application-dev.yml` — WhatsApp config now uses `${WHATSAPP_*}` env vars (was hardcoded `DEV_*` placeholders)
+- `.env.example` — real access token replaced with placeholder (security fix)
+- `MetaCredentials.txt` — updated with reference info (no real secrets)
+
+**Full suite: 83/83 tests passing (0 regressions)**
+(84th test = `EnrollmentIntegrationTest`, requires Testcontainers — deferred, unchanged)
+
 ---
 
-## Next: Phase 4.2 — WhatsApp Checklist Scheduling & Response Processing
+## Next: Phase 5.1 — Clinician Dashboard (Frontend)
